@@ -12,13 +12,8 @@ EXE="$@"
 
 echo "** Checking $DIR for changes..."
 
-execute() {
-  $EXE
-  echo "** Applicaton exited with code $?"
-}
-
 echo "** Starting $EXE"
-execute &
+$EXE &
 PID=$!
 
 inotifywait -m -r -e create -e close_write -e modify -e delete  "$DIR" | while read line
@@ -26,6 +21,6 @@ do
   echo "** Filesystem changed - $line"
   echo "** Restarting $EXE"
   kill -9 $PID
-  execute &
+  $EXE &
   PID=$!
 done
