@@ -1,0 +1,31 @@
+#!/bin/bash
+
+DIR="$1"
+shift
+EXE="$@"
+
+#
+# This script monitors filesystem changes in $DIR and executes
+# the command $EXE on every change. It's the poor's man nodemon.
+# Any competent bash programmer would definitely write it much better.
+#
+
+echo "** Checking $DIR for changes..."
+
+execute() {
+  $EXE
+  echo "** Applicaton exited with code $?"
+}
+
+echo "** Starting $EXE"
+execute &
+PID=$!
+
+inotifywait -m -r -e create -e close_write -e modify -e delete  "$DIR" | while read line
+do
+  echo "** Filesystem changed - $line"
+  echo "** Restarting $EXE"
+  kill -9 $PID
+  execute &
+  PID=$!
+done
