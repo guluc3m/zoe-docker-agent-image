@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-while ! nc -z rabbitmq 9999
+while ! nc -z rabbitmq 15672
 do 
     echo 'Waiting...'
     sleep 2
